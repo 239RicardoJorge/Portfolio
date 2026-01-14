@@ -1,37 +1,110 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DATA } from './data';
-import { ArchiveIcon } from 'lucide-react';
 
 function App() {
   const [navScrolled, setNavScrolled] = useState(false);
-  const viewportRef = useRef<HTMLDivElement>(null);
 
-  // Archive Preview State
+  // Archive Preview State - now controlled by scroll, not hover
+  const [activeArchiveIndex, setActiveArchiveIndex] = useState<number>(0);
   const [previewData, setPreviewData] = useState<{ img: string; role: string; director: string; active: boolean }>({
-    img: '',
-    role: '',
-    director: '',
-    active: false
+    img: DATA.archive[0]?.img || '',
+    role: DATA.archive[0]?.role || '',
+    director: DATA.archive[0]?.director || '',
+    active: true
   });
 
-  // Scroll Listener for Navbar
+  // Parallax effect for project images
+  const handleParallax = useCallback(() => {
+    const images = document.querySelectorAll('.card-image img');
+
+    images.forEach((img) => {
+      const card = img.closest('.card');
+      if (!card) return;
+
+      const rect = card.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      // Only apply parallax when card is in view
+      if (rect.top < viewportHeight && rect.bottom > 0) {
+        // Calculate parallax offset (slower scroll = image moves up relative to card)
+        const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+        const parallaxOffset = (progress - 0.5) * 40; // -20px to +20px range
+
+        (img as HTMLElement).style.transform = `translateY(${parallaxOffset}px)`;
+      }
+    });
+  }, []);
+
+  // Scroll-based archive selection
+  const handleArchiveScroll = useCallback(() => {
+    const archiveSection = document.getElementById('archive');
+    if (!archiveSection) return;
+
+    const archiveRect = archiveSection.getBoundingClientRect();
+
+    // Only process when archive section is in view
+    if (archiveRect.top > window.innerHeight || archiveRect.bottom < 0) return;
+
+    const rows = document.querySelectorAll('.row-item');
+    if (rows.length === 0) return;
+
+    // Find which row is closest to the center of the viewport
+    const viewportCenter = window.innerHeight / 2;
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    rows.forEach((row, index) => {
+      const rect = row.getBoundingClientRect();
+      const rowCenter = rect.top + rect.height / 2;
+      const distance = Math.abs(rowCenter - viewportCenter);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    // Update classes directly for immediate visual feedback
+    rows.forEach((row, index) => {
+      if (index === closestIndex) {
+        row.classList.add('active');
+      } else {
+        row.classList.remove('active');
+      }
+    });
+
+    // Update preview data in React state
+    if (closestIndex !== activeArchiveIndex) {
+      setActiveArchiveIndex(closestIndex);
+      const item = DATA.archive[closestIndex];
+      if (item) {
+        setPreviewData({
+          img: item.img,
+          role: item.role,
+          director: item.director,
+          active: true
+        });
+      }
+    }
+  }, [activeArchiveIndex]);
+
+  // Combined scroll handler - now uses window scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (viewportRef.current) {
-        setNavScrolled(viewportRef.current.scrollTop > 50);
-      }
+      setNavScrolled(window.scrollY > 50);
+      handleParallax();
+      handleArchiveScroll();
     };
 
-    const currentViewport = viewportRef.current;
-    if (currentViewport) {
-      currentViewport.addEventListener('scroll', handleScroll);
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Initial call
+    handleScroll();
+
     return () => {
-      if (currentViewport) {
-        currentViewport.removeEventListener('scroll', handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [handleParallax, handleArchiveScroll]);
 
   // Copy to Clipboard Function
   const copyToClipboard = async (text: string, event: React.MouseEvent<HTMLButtonElement>) => {
@@ -51,7 +124,7 @@ function App() {
     <div id="app-wrapper" style={{ height: '100%', overflow: 'hidden' }}>
 
       {/* Virtual Viewport */}
-      <div id="app-viewport" ref={viewportRef}>
+      <div id="app-viewport">
 
         {/* Granular Noise */}
         <div className="noise"></div>
@@ -96,9 +169,9 @@ function App() {
           <header className="hero" id="top">
             <div className="hero-content">
               <h1 className="name-structure">
-                <div className="name-line">R <span className="slash">\\</span> CARDO</div>
+                <div className="name-line">RICARDO</div>
                 <div className="name-line">JORGE</div>
-                <div className="name-line">BAT <span class="slash">/</span> STA</div>
+                <div className="name-line">BATISTA</div>
               </h1>
 
               <div className="titles">
@@ -123,19 +196,17 @@ function App() {
 
             <div className="gallery-grid" id="selected-container">
               {DATA.selectedWorks.map((work, index) => (
-                <div className={`card ${work.gridClass || ''}`} key={index}>
-                  <div className="card-image blur-img">
+                <div className={`card ${work.gridClass || 'col-span-1'}`} key={index}>
+                  <div className="card-image">
                     <img src={work.img} alt={work.title} />
                   </div>
                   <div className="card-info">
-                    <h3>{work.title} <span className="year">({work.year})</span></h3>
-                    {work.award && (
-                      <div className="award">
-                        <span className="award-label">★ {work.award}</span>
-                      </div>
-                    )}
-                    <p className="director">Directed by {work.director}</p>
-                    <p className="role">{work.role}</p>
+                    <div className="project-meta">
+                      {work.title} <span style={{ opacity: 0.5, margin: '0 4px' }}>–</span> {work.year}
+                    </div>
+                    <div className="project-role">
+                      {work.role}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -189,17 +260,11 @@ function App() {
                   <span className="section-title">Full Archive (2013 — 2024)</span>
                 </div>
 
-                <div className="archive-rows" id="archive-container">
+                <div className="archive-rows has-active" id="archive-container">
                   {DATA.archive.map((item, index) => (
                     <div
                       key={index}
-                      className="row-item"
-                      onMouseEnter={() => setPreviewData({
-                        img: item.img,
-                        role: item.role,
-                        director: item.director,
-                        active: true
-                      })}
+                      className={`row-item ${index === 0 ? 'active' : ''}`}
                     >
                       {item.title} ({item.year})
                     </div>
