@@ -1,4 +1,6 @@
-export const DATA = {
+import { PortfolioData } from '../types';
+
+export const DATA: PortfolioData = {
     selectedWorks: [
         {
             title: "LUPUS",
@@ -103,3 +105,9 @@ export const DATA = {
     ]
 };
 
+export const CONTACT = {
+    email: 'ricardopastahbatista@gmail.com',
+    phone: '+351 926 170 603',
+    phoneRaw: '+351926170603',
+    location: 'Lisbon, Portugal'
+};

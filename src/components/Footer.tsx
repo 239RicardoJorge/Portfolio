@@ -1,0 +1,12 @@
+import React from 'react';
+
+export const Footer: React.FC = () => {
+    const currentYear = new Date().getFullYear();
+
+    return (
+        <footer className="footer">
+            <div>© {currentYear} Ricardo Jorge Batista</div>
+            <div>Multidisciplinary Artist</div>
+        </footer>
+    );
+};

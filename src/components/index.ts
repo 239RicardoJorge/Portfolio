@@ -1,0 +1,9 @@
+export { Navigation } from './Navigation';
+export { Hero } from './Hero';
+export { SelectedWorks } from './SelectedWorks';
+export { Spotify } from './Spotify';
+export { Archive } from './Archive';
+export { Contact } from './Contact';
+export { Sidebar } from './Sidebar';
+export { Footer } from './Footer';
+export { CopyButton } from './CopyButton';
