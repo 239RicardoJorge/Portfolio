@@ -14,6 +14,7 @@ export interface ArchiveItem {
     role: string;
     director: string;
     img: string;
+    color?: string;
 }
 
 export interface Course {

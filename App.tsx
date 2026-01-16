@@ -87,30 +87,53 @@ function App() {
     }
 
     const archiveRect = archiveSection.getBoundingClientRect();
-    if (archiveRect.top > window.innerHeight || archiveRect.bottom < 0) return;
+
+    // Check if outside view - reset background and return
+    if (archiveRect.top > window.innerHeight || archiveRect.bottom < 0) {
+      document.documentElement.style.setProperty('--bg', '#0a0a0a');
+      return;
+    }
 
     const rows = document.querySelectorAll('.row-item');
     if (rows.length === 0) return;
 
-    const selectionPoint = window.innerHeight / 4;
-    let closestIndex = 0;
-    let closestDistance = Infinity;
+    // Calculate active index based on actual element positions
+    const archiveContainer = document.getElementById('archive-container');
+    const selectionPoint = window.innerHeight * 0.25; // 25% down the screen
 
-    rows.forEach((row, index) => {
-      const rect = row.getBoundingClientRect();
-      const rowCenter = rect.top + rect.height / 2;
-      const distance = Math.abs(rowCenter - selectionPoint);
+    let newActiveIndex = -1;
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
+    if (archiveContainer) {
+      const rows = Array.from(archiveContainer.children);
+
+      // Find the row closest to the selection point
+      let minDistance = Infinity;
+
+      rows.forEach((row, index) => {
+        const rect = row.getBoundingClientRect();
+        // Calculate distance from the row's center to the selection point
+        const rowCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(rowCenter - selectionPoint);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          newActiveIndex = index;
+        }
+      });
+    }
+
+    const closestIndex = newActiveIndex !== -1 ? newActiveIndex : 0;
 
     // Update classes for visual feedback
     rows.forEach((row, index) => {
       row.classList.toggle('active', index === closestIndex);
     });
+
+    // Apply background color for the current item
+    // const item = DATA.archive[closestIndex];
+    // if (item && item.color) {
+    //   document.documentElement.style.setProperty('--bg', item.color);
+    // }
 
     // Update React state
     if (closestIndex !== activeArchiveIndex) {
