@@ -13,7 +13,7 @@ export const Hero: React.FC = () => {
                 <div className="titles">
                     <h2>Creative Director</h2>
                     <h2>Multidisciplinary Artist</h2>
-                    <h2>SENIOR ENTROPY MANAGER</h2>
+                    <h2>Senior Entropy Manager</h2>
                 </div>
             </div>
 

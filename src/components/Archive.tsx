@@ -10,14 +10,14 @@ interface ArchiveProps {
 export const Archive: React.FC<ArchiveProps> = ({ items, activeIndex, previewData }) => {
     return (
         <section id="archive" className="archive-section">
+            <div className="section-header">
+                <span className="section-number">03</span>
+                <span className="section-title">Full Archive (2013 — 2024)</span>
+            </div>
+
             <div className="archive-wrapper">
                 {/* Left Column: List */}
                 <div className="archive-list-col">
-                    <div className="section-header">
-                        <span className="section-number">03</span>
-                        <span className="section-title">Full Archive (2013 — 2024)</span>
-                    </div>
-
                     <div className="archive-rows has-active" id="archive-container">
                         {items.map((item, index) => (
                             <div
