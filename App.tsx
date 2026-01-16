@@ -76,7 +76,7 @@ function App() {
     if (firstRowRect.top > topOffset) {
       // First row hasn't reached top yet - normal position
       stickyViewport.classList.remove('is-fixed', 'is-bottom');
-    } else if (colRect.bottom > viewportHeight + topOffset) {
+    } else if (colRect.bottom > viewportHeight + 40) {
       // Column is scrolling - fix the viewport
       stickyViewport.classList.add('is-fixed');
       stickyViewport.classList.remove('is-bottom');
@@ -92,14 +92,14 @@ function App() {
     const rows = document.querySelectorAll('.row-item');
     if (rows.length === 0) return;
 
-    const viewportCenter = window.innerHeight / 2;
+    const selectionPoint = window.innerHeight / 4;
     let closestIndex = 0;
     let closestDistance = Infinity;
 
     rows.forEach((row, index) => {
       const rect = row.getBoundingClientRect();
       const rowCenter = rect.top + rect.height / 2;
-      const distance = Math.abs(rowCenter - viewportCenter);
+      const distance = Math.abs(rowCenter - selectionPoint);
 
       if (distance < closestDistance) {
         closestDistance = distance;

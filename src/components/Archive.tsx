@@ -38,7 +38,7 @@ export const Archive: React.FC<ArchiveProps> = ({ items, activeIndex, previewDat
                                 <div className="preview-placeholder" id="preview-placeholder">Hover a project</div>
                             ) : (
                                 <div className="preview-content-box" id="preview-content">
-                                    <div className="preview-image-box blur-img">
+                                    <div className="preview-image-box">
                                         <img id="preview-img" src={previewData.img} alt="Work Preview" />
                                     </div>
                                     <div className="preview-meta">

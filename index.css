@@ -433,6 +433,7 @@ section {
 
 .archive-list-col {
     flex: 1;
+    padding-bottom: 50vh;
 }
 
 .archive-section>.section-header {
